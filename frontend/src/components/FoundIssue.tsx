@@ -18,7 +18,7 @@ export const FoundIssue = () => {
           </p>
 
           <a
-            href="https://github.com/code100x/chess/issues"
+            href="https://github.com/code100x/plinkoo/issues"
             target="_blank"
             className="mt-10 text-white rounded-2xl px-4 py-4 border border-slate-400 bg-transparent w-full text-2xl flex gap-10 items-center justify-center"
           >
