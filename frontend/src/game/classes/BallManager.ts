@@ -23,9 +23,20 @@ export class BallManager {
     }
 
     addBall(startX?: number) {
+        const audio = new Audio('/mixkit-hard-typewriter-click-1119.wav');
+        audio.play();
         const newBall = new Ball(startX || pad(WIDTH / 2 + 13), pad(50), ballRadius, 'red', this.ctx, this.obstacles, this.sinks, (index) => {
             this.balls = this.balls.filter(ball => ball !== newBall);
             this.onFinish?.(index, startX)
+
+            const audioContext = new AudioContext();
+            const oscillator = audioContext.createOscillator();
+            oscillator.frequency.value = 420; // A4
+            oscillator.connect(audioContext.destination);
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.15);
+
+            this.drawSinkOnEnd(index);
         });
         this.balls.push(newBall);
     }
@@ -69,6 +80,16 @@ export class BallManager {
             this.ctx.fillStyle = this.getColor(i).color;
             this.ctx.fillText((sink?.multiplier)?.toString() + "x", sink.x - 15 + sinkWidth / 2, sink.y);
         };
+    }
+
+    drawSinkOnEnd(index: number) {
+        const sink = this.sinks[index];
+        this.ctx.font='normal 13px Arial';
+        this.ctx.clearRect(sink.x, sink.y - sink.height / 2, sink.width - (2*obstacleRadius), sink.height);
+        this.ctx.fillStyle = this.getColor(index).background;
+        this.ctx.fillRect(sink.x, sink.y + 12.5 - sink.height / 2, sink.width - (2*obstacleRadius), sink.height);
+        this.ctx.fillStyle = this.getColor(index).color;
+        this.ctx.fillText((sink?.multiplier)?.toString() + "x", sink.x - 15 + sinkWidth / 2, sink.y);
     }
 
     draw() {
