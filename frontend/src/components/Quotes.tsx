@@ -14,8 +14,9 @@ export const Quotes = () => {
         multipliers ensuring this Stake Original game is suited for everyone at
         our online casino !
       </h3>
-      <Button className="hover:bg-green-600" onClick={() => navigate("/game")}>
-        Play Plinko
+      <Button className="active:border-green-600 from-green-600 to-green-500 border-green-700" onClick={() => navigate("/game")}>
+        <span className="absolute w-0 h-0 transition-all duration-300 ease-out bg-[#302e2b] rounded-full group-hover:w-[600px] group-hover:h-36 opacity-10"></span>
+        <span className="relative">Play Plinko</span>
       </Button>
     </div>
   );
