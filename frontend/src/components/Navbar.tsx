@@ -53,16 +53,18 @@ export const Navbar = () => {
         </div>
         <div className="hidden w-full md:block md:w-auto" id="navbar-default">
           <Button
-            className="bg-transparent mx-4 hover:bg-black"
+            className="bg-transparent mx-4 active:border-green-600 from-green-600 to-green-500 border-green-700"
             onClick={() => navigate("/simulation")}
           >
-            Simulation
+          <span className="absolute w-0 h-0 transition-all duration-300 ease-out bg-[#262522] rounded-full group-hover:w-24 group-hover:h-24 opacity-10"></span>
+            <span className="relative">Simulation</span>
           </Button>
           <Button
-            className="bg-transparent mx-4 hover:bg-black"
+            className="bg-transparent mx-4 active:border-green-600 from-green-600 to-green-500 border-green-700"
             onClick={() => navigate("/game")}
           >
-            Game
+            <span className="absolute w-0 h-0 transition-all duration-300 ease-out bg-[#262522] rounded-full group-hover:w-24 group-hover:h-24 opacity-10"></span>
+            <span className="relative">Game</span>
           </Button>
         </div>
       </div>
