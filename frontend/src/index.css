@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -5,14 +9,15 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #0e212e;
-
+  /* background-color: #213743; */
+  background-color: #302e2b;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: "Times New Roman", Times, serif;
 }
-
+/* 
 a {
   font-weight: 500;
   color: #646cff;
@@ -65,4 +70,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */

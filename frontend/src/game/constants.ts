@@ -10,4 +10,4 @@ export const horizontalFriction = 0.4;
 export const verticalFriction = 0.8;
 
 export const sinkWidth = 36;
-export const NUM_SINKS = 17
+export const NUM_SINKS = 17;
