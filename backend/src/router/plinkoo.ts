@@ -1,5 +1,6 @@
-import {outcomes} from "../outcomes";
-import {Router} from "express";
+import { outcomes } from "../outcomes";
+import { Router } from "express";
+import { db } from "../db";
 
 const router = Router();
 
@@ -25,7 +26,8 @@ const MULTIPLIERS: { [key: number]: number } = {
     16: 16
 }
 
-router.post("/game", (req, res) => {
+router.post("/game", async (req, res) => {
+    const { userId, userBalance, betAmount, difficulty, rows } = req.body;
     let outcome = 0;
     const pattern = []
     for (let i = 0; i < TOTAL_DROPS; i++) {
@@ -38,13 +40,26 @@ router.post("/game", (req, res) => {
     }
 
     const multiplier = MULTIPLIERS[outcome];
-    const possiblieOutcomes = outcomes[outcome];
+    const possibleOutcomes = outcomes[outcome];
 
-    res.send({
-        point: possiblieOutcomes[Math.floor(Math.random() * possiblieOutcomes.length || 0)],
-        multiplier,
-        pattern
-    });
+    const newBalance = (userBalance - betAmount) + (betAmount * multiplier);
+
+    try {
+        const updatedUser = await db.user.update({
+            where: { id: userId },
+            data: { balance: newBalance }
+        });
+
+        res.status(200).json({
+            point: possibleOutcomes[Math.floor(Math.random() * possibleOutcomes.length || 0)],
+            multiplier,
+            pattern,
+            newBalance
+        });
+    } catch (error) {
+        console.error("Error updating user balance:", error);
+        res.status(500).json({ status: "error", message: "Internal server error" });
+    }
 });
 
 export default router;

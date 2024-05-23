@@ -4,6 +4,8 @@ export interface User {
     token: string;
     id: string;
     name: string;
+    balance: number,
+    authorized: boolean
 }
 
 const BACKEND_URL = 'http://localhost:3000';

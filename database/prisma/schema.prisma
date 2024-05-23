@@ -15,7 +15,7 @@ model User {
   email    String       @unique
   provider AuthProvider
   password String?
-  balance  Int          @default(0)
+  balance  Float        @default(0.00)
 }
 
 enum AuthProvider {

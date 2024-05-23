@@ -10,7 +10,7 @@ export class BallManager {
     private obstacles: Obstacle[]
     private sinks: Sink[]
     private requestId?: number;
-    private onFinish?: (index: number,startX?: number) => void;
+    onFinish?: (index: number,startX?: number) => void;
 
     constructor(canvasRef: HTMLCanvasElement, onFinish?: (index: number,startX?: number) => void) {
         this.balls = [];
