@@ -12,12 +12,12 @@ export class BallManager {
     private requestId?: number;
     private onFinish?: (index: number,startX?: number) => void;
 
-    constructor(canvasRef: HTMLCanvasElement, onFinish?: (index: number,startX?: number) => void) {
+    constructor(canvasRef: HTMLCanvasElement,rows:number, onFinish?: (index: number,startX?: number) => void) {
         this.balls = [];
         this.canvasRef = canvasRef;
         this.ctx = this.canvasRef.getContext("2d")!;
-        this.obstacles = createObstacles();
-        this.sinks = createSinks();
+        this.obstacles = createObstacles(rows);
+        this.sinks = createSinks(rows);
         this.update();
         this.onFinish = onFinish;
     }
