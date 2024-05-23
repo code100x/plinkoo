@@ -1,53 +1,45 @@
-
 import express from "express";
 import { outcomes } from "./outcomes";
 import cors from "cors";
+import authRoute from './router/auth';
+import plinkooRoute from './router/plinkoo'
+import session from 'express-session';
+import dotenv from "dotenv";
+import passport from "passport";
+import {initPassport} from "./passport";
 
 const app = express();
-app.use(cors())
 
-const TOTAL_DROPS = 16;
+dotenv.config();
+app.use(
+    session({
+        secret: process.env.COOKIE_SECRET || 'keyboard cat',
+        resave: false,
+        saveUninitialized: false,
+        cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 },
+    }),
+);
 
-const MULTIPLIERS: {[ key: number ]: number} = {
-    0: 16,
-    1: 9,
-    2: 2,
-    3: 1.4,
-    4: 1.4,
-    5: 1.2,
-    6: 1.1,
-    7: 1,
-    8: 0.5,
-    9: 1,
-    10: 1.1,
-    11: 1.2,
-    12: 1.4,
-    13: 1.4,
-    14: 2,
-    15: 9,
-    16: 16
-}
+initPassport();
+app.use(passport.initialize());
+app.use(passport.authenticate('session'));
 
-app.post("/game", (req, res) => {
-    let outcome = 0;
-    const pattern = []
-    for (let i = 0; i < TOTAL_DROPS; i++) {
-        if (Math.random() > 0.5) {
-            pattern.push("R")
-            outcome++;
-        } else {
-            pattern.push("L")
-        }
-    }
+const allowedHosts = process.env.ALLOWED_HOSTS
+    ? process.env.ALLOWED_HOSTS.split(',')
+    : [];
 
-    const multiplier = MULTIPLIERS[outcome];
-    const possiblieOutcomes = outcomes[outcome];
+app.use(
+    cors({
+        origin: allowedHosts,
+        methods: 'GET,POST,PUT,DELETE',
+        credentials: true,
+    }),
+);
 
-    res.send({
-        point: possiblieOutcomes[Math.floor(Math.random() * possiblieOutcomes.length || 0)],
-        multiplier,
-        pattern
-    });
+app.use('/auth', authRoute);
+app.use("/plinkoo", plinkooRoute)
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
-
-app.listen(3000)

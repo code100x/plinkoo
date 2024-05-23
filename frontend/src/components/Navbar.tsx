@@ -1,71 +1,59 @@
-import { RxHamburgerMenu } from "react-icons/rx";
-import { Button } from "./ui";
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {useUser} from "../../store/hooks/useUser.ts";
+import axios from "axios";
 
 export const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const user = useUser();
+  const BACKEND_URL = import.meta.env.VITE_APP_BACKEND_URL ?? 'http://localhost:3000';
+
+  const handleLogin = () => {
+    navigate("/login")
+  };
+
+  const handleLogout = async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/auth/logout`);
+      if (response.status === 200) {
+        navigate("/");
+      } else {
+        console.error("Logout failed:", response.data.error);
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   return (
-    <nav className="bg-white z-50 border-gray-200 dark:bg-[#262522] borbder-b shadow-lg">
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <Link
-          to="/"
-          className="flex items-center space-x-3 rtl:space-x-reverse"
-        >
-          {/* <img
-            src="https://res.cloudinary.com/dcugqfvvg/image/upload/v1713647295/standardboard.1d6f9426_asqzum.png"
-            className="h-8"
-            alt="plinkoo Logo"
-          /> */}
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-            Plinkoo.100x
-          </span>
-        </Link>
-        <Button
-          data-collapse-toggle="navbar-default"
-          className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm  rounded-lg md:hidden focus:outline-none focus:ring-2 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600 bg-transparent"
-          onClick={() => {
-            setIsMenuOpen(!isMenuOpen);
-          }}
-        >
-          <span className="sr-only">Open main menu</span>
-          <RxHamburgerMenu size={30} />
-        </Button>{" "}
-        <div
-          className={`w-full lg:hidden flex flex-col md:w-auto items-center ${
-            isMenuOpen ? "" : "hidden"
-          }`}
-          id="navbar-default"
-        >
-          <Button
-            className="bg-transparent mx-4 hover:bg-black w-[50%]"
-            onClick={() => navigate("/simulation")}
+      <div className="appbar relative top-0 left-0 right-0 z-10 flex justify-between items-center bg-[#1a2c38] text-white p-4 border-b-2 border-gray-700">
+        <button onClick={() => navigate("/")}>
+          <div className="text-2xl font-bold">Casino.100x</div>
+        </button>
+        <div className="flex gap-4">
+          <button
+              className="px-4 py-2 rounded-md bg-white hover:bg-gray-300 text-black font-bold"
+              onClick={() => navigate("/")}
           >
-            Simulation
-          </Button>
-          <Button
-            className="bg-transparent mx-4 hover:bg-black w-[50%]"
-            onClick={() => navigate("/game")}
-          >
-            Game
-          </Button>
-        </div>
-        <div className="hidden w-full md:block md:w-auto" id="navbar-default">
-          <Button
-            className="bg-transparent mx-4 hover:bg-black"
-            onClick={() => navigate("/simulation")}
-          >
-            Simulation
-          </Button>
-          <Button
-            className="bg-transparent mx-4 hover:bg-black"
-            onClick={() => navigate("/game")}
-          >
-            Game
-          </Button>
+            Games
+          </button>
+          {!user ? (
+              <button
+                  className="px-4 py-2 rounded-md bg-white hover:bg-gray-300 text-black font-bold"
+                  onClick={handleLogin}
+              >
+                Login/Signup
+              </button>
+          ) : (
+              <div className="flex gap-4">
+                <button
+                    className="btn-danger px-4 py-2 rounded-md bg-white hover:bg-gray-300 text-black font-bold"
+                    onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </div>
+          )}
         </div>
       </div>
-    </nav>
   );
 };
