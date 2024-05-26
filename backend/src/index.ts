@@ -2,13 +2,16 @@
 import express from "express";
 import { outcomes } from "./outcomes";
 import cors from "cors";
+import { getObstacles } from "./utils/game";
+import { pad, unpad } from "./constants/padding";
+import { WIDTH, ballRadius, horizontalFriction, verticalFriction } from "./constants";
 
 const app = express();
 app.use(cors())
 
 const TOTAL_DROPS = 16;
 
-const MULTIPLIERS: {[ key: number ]: number} = {
+const MULTIPLIERS: { [key: number]: number } = {
     0: 16,
     1: 9,
     2: 2,
@@ -27,27 +30,64 @@ const MULTIPLIERS: {[ key: number ]: number} = {
     15: 9,
     16: 16
 }
+app.post("/stake", (req, res) => {
 
+})
 app.post("/game", (req, res) => {
     let outcome = 0;
-    const pattern = []
-    for (let i = 0; i < TOTAL_DROPS; i++) {
-        if (Math.random() > 0.5) {
-            pattern.push("R")
-            outcome++;
-        } else {
-            pattern.push("L")
-        }
-    }
+    const pattern: Array<'L' | 'R'> = []
+    const obstacles = getObstacles()
 
+    let possiblieOutcomes = outcomes[outcome];
+    const startX = possiblieOutcomes[Math.floor(Math.random() * possiblieOutcomes.length)] || pad(WIDTH / 2 + 13)
+    const startY = pad(50)
+    let x = startX
+    let y = startY
+    let vx = 0
+    let vy = 0
+    // Collision with obstacles
+    obstacles.forEach(obstacle => {
+        const dist = Math.hypot(x - obstacle.x, y - obstacle.y);
+        if (dist < pad(ballRadius + obstacle.radius)) {
+            // Calculate collision angle
+            const angle = Math.atan2(y - obstacle.y, x - obstacle.x);
+            // Reflect velocity
+            const speed = Math.sqrt(vx * vx + vy * vy);
+            vx = (Math.cos(angle) * speed * horizontalFriction);
+            vy = Math.sin(angle) * speed * verticalFriction;
+
+            // Adjust position to prevent sticking
+            const overlap = ballRadius + obstacle.radius - unpad(dist);
+            x += pad(Math.cos(angle) * overlap);
+            y += pad(Math.sin(angle) * overlap);
+            if (pad(Math.cos(angle) * overlap) > 0) {
+                pattern.push('R');
+                outcome++
+            } else {
+                pattern.push('L')
+                outcome--;
+            }
+        }
+    });
+    console.log("Outcomes : ", outcome)
     const multiplier = MULTIPLIERS[outcome];
-    const possiblieOutcomes = outcomes[outcome];
+
+
 
     res.send({
-        point: possiblieOutcomes[Math.floor(Math.random() * possiblieOutcomes.length || 0)],
+        point: startX,
         multiplier,
         pattern
     });
 });
 
 app.listen(3000)
+
+// for (let i = 0; i < TOTAL_DROPS; i++) {
+//     if (Math.random() > 0.5) {
+//         pattern.push("R")
+//         outcome++;
+//     } else {
+//         pattern.push("L")
+//     }
+// }
