@@ -12,8 +12,8 @@ app.use(cors())
 const TOTAL_DROPS = 16;
 
 const MULTIPLIERS: { [key: number]: number } = {
-    0: 5,
-    1: 3,
+    0: 16,
+    1: 9,
     2: 2,
     3: 1.4,
     4: 1.4,
@@ -27,8 +27,8 @@ const MULTIPLIERS: { [key: number]: number } = {
     12: 1.4,
     13: 1.4,
     14: 2,
-    15: 3,
-    16: 5
+    15: 9,
+    16: 16
 }
 app.post("/stake", (req, res) => {
 
