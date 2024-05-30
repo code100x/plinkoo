@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format:check": "npx prettier --check .",
+    "format:fix": "npx prettier --write .",
+    "typecheck": "tsc --pretty --noEmit"
   },
   "dependencies": {
     "axios": "^1.7.1",
