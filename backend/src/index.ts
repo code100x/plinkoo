@@ -2,6 +2,7 @@
 import express from "express";
 import { outcomes } from "./outcomes";
 import cors from "cors";
+import crypro from "crypto";
 
 const app = express();
 app.use(cors())
@@ -27,6 +28,22 @@ const MULTIPLIERS: {[ key: number ]: number} = {
     15: 9,
     16: 16
 }
+
+const getServerSeed = () => {
+    return crypro.randomBytes(32).toString("hex");
+}
+
+const getClientSeed = () => {
+    return crypro.randomBytes(32).toString("hex");
+}
+
+
+app.get("/seed", (req, res) => {
+    res.send({
+        serverSeed: getServerSeed(),
+        clientSeed: getClientSeed()
+    });
+});
 
 app.post("/game", (req, res) => {
     let outcome = 0;
