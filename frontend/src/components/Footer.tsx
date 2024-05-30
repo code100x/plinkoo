@@ -1,4 +1,5 @@
-import { FaGithub, FaTwitter, FaYoutube } from "react-icons/fa";
+import { FaGithub, FaYoutube } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
@@ -31,7 +32,7 @@ export const Footer = () => {
                 <FaYoutube size={30} />
               </a>
               <a href="https://twitter.com/kirat_tw" target="_blank">
-                <FaTwitter size={30} />
+                <FaXTwitter size={30} />
               </a>
             </div>
           </div>
