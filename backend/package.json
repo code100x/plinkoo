@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc -b",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "format:check": "npx prettier --check .",
+    "format:fix": "npx prettier --write .",
+    "typecheck": "tsc --pretty --noEmit"
   },
   "keywords": [],
   "author": "",
