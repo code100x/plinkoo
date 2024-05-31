@@ -3,6 +3,7 @@ import express from "express";
 import { outcomes } from "./outcomes";
 import cors from "cors";
 import crypro from "crypto";
+import { handlePlinko } from "./algorithm";
 
 const app = express();
 app.use(cors())
@@ -37,12 +38,19 @@ const getClientSeed = () => {
     return crypro.randomBytes(32).toString("hex");
 }
 
-
+// 1. First get seeds using Crypto module
 app.get("/seed", (req, res) => {
     res.send({
         serverSeed: getServerSeed(),
         clientSeed: getClientSeed()
     });
+});
+
+// 2. Then post the seeds to get the result 
+app.post("/plinko", (req, res) => {
+    const { serverSeed, clientSeed } = req.body;
+    const result = handlePlinko(serverSeed, clientSeed, "1", 8, "Low");
+    res.send(result);
 });
 
 app.post("/game", (req, res) => {

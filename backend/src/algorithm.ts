@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import {createHash} from 'crypto';
 
 type Payout = {
   rows: number;
@@ -42,7 +42,7 @@ export function final_payout(risk: string, rows: number): number[] {
 
 function bytes(data: string): string {
   let result = '';
-  result = crypto.createHash('sha512').update(data).digest('hex');
+  result = createHash('sha512').update(data).digest('hex');
   console.log('result hash', result);
   return result;
 }
