@@ -15,7 +15,7 @@ export interface Sink {
     multiplier?: number;
 }
 
-const MULTIPLIERS: {[ key: number ]: number} = {
+const LOW_MULTIPLIERS: {[ key: number ]: number} = {
     1: 16,
     2: 9,
     3: 2,
@@ -34,6 +34,44 @@ const MULTIPLIERS: {[ key: number ]: number} = {
     16: 9,
     17: 16
 }
+const MED_MULTIPLIERS: {[ key: number ]: number} = {
+    1: 110,
+    2: 41,
+    3: 10,
+    4: 5,
+    5: 3,
+    6: 1.5,
+    7: 1,
+    8: 0.5,
+    9: 0.3,
+    10: 0.5,
+    11: 1,
+    12: 1.5,
+    13: 3,
+    14: 5,
+    15: 10,
+    16: 41,
+    17: 110
+}
+const HIGH_MULTIPLIERS: {[ key: number ]: number} = {
+    1: 1000,
+    2: 130,
+    3: 26,
+    4: 9,
+    5: 4,
+    6: 2,
+    7: 0.2,
+    8: 0.2,
+    9: 0.2,
+    10: 0.2,
+    11: 0.2,
+    12: 2,
+    13: 4,
+    14: 9,
+    15: 26,
+    16: 130,
+    17: 1000
+}
 
 export const createObstacles = (): Obstacle[] => {
     const obstacles: Obstacle[] = [];
@@ -50,7 +88,7 @@ export const createObstacles = (): Obstacle[] => {
     return obstacles;
 }
 
-export const createSinks = (): Sink[] => {
+export const createSinks = (type:string): Sink[] => {
     const sinks = [];
     const SPACING = obstacleRadius * 2;
 
@@ -59,7 +97,13 @@ export const createSinks = (): Sink[] => {
       const y = HEIGHT - 170;
       const width = sinkWidth;
       const height = width;
-      sinks.push({ x, y, width, height, multiplier: MULTIPLIERS[i+1] });
+      if(type == "Low")sinks.push({ x, y, width, height, multiplier: LOW_MULTIPLIERS[i+1] });
+      else if(type == "Medium"){
+        sinks.push({ x, y, width, height, multiplier: MED_MULTIPLIERS[i+1] })
+      }
+      else{
+        sinks.push({ x, y, width, height, multiplier: HIGH_MULTIPLIERS[i+1] })
+      }
     }
 
     return sinks;
