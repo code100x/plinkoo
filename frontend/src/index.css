@@ -15,8 +15,25 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: "Times New Roman", Times, serif;
 }
+
+/* Scrollbar Track */
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* Color of the scrollbar track */
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+  background-color: #f1f1f1; /* Color of the scrollbar */
+}
+
+/* Scrollbar Thumb */
+::-webkit-scrollbar-thumb {
+  background-color: #888; /* Color of the scrollbar thumb */
+  border-radius: 4px; /* Radius of the scrollbar thumb */
+}
+
 /* 
 a {
   font-weight: 500;

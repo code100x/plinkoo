@@ -1,7 +1,7 @@
 #root {
-  max-width: 1280px;
+  /* max-width: 1280px; */
   margin: 0 auto;
-  padding: 2rem;
+  /* padding: 2rem; */
   text-align: center;
 }
 
@@ -39,4 +39,35 @@
 
 .read-the-docs {
   color: #888;
+}
+
+.stack-container {
+  margin-top: 20px;
+  margin-left: 20px;
+  padding: 20px;
+  border: 2px solid white;
+  border-top: none;
+  max-height: calc(6 * (60px));
+  width: 120px;
+}
+
+.stack-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.stack-item {
+  padding: 10px 15px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  color: white;
+  font-weight: bold;
+  background-image: linear-gradient(to bottom, orange, red);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.5s ease;
+}
+
+.stack-item:hover {
+  background-image: linear-gradient(to bottom, rgb(192, 125, 0), rgb(196, 0, 0));
 }
