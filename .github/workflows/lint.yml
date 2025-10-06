@@ -1,0 +1,22 @@
+name: Linting and Formatting the PR
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  Continuous-Integration:
+    name: Performs linting and formatting on the PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+      - name: Install dependencies
+        run: pnpm install
+      - name: Lint
+        run: pnpm lint
+      - name: Format
+        run: pnpm format

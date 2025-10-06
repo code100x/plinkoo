@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Game {
+  blackjack
+  dice
+  keno
+  mines
+  roulette
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  googleId           String?             @unique
+  email              String              @unique
+  name               String?
+  password           String?
+  picture            String?
+  balance            String              @default("1000000") // Amount in cents (multiply by 100, default 10000.00)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  provablyFairStates ProvablyFairState[]
+  bets               Bet[]
+
+  @@map("users")
+}
+
+model ProvablyFairState {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+  serverSeed       String
+  clientSeed       String
+  hashedServerSeed String   @default("")
+  nonce            Int
+  revealed         Boolean  @default(false)
+  createdAt        DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+  bets      Bet[]
+
+  @@index([userId, revealed, hashedServerSeed])
+  @@map("provably_fair_states")
+}
+
+model Bet {
+  id                  String            @id @default(cuid())
+  betId               BigInt            @unique @default(autoincrement())
+  userId              String
+  game                Game // The game this bet belongs to
+  betAmount           Int // Amount in cents (multiply by 100)
+  payoutAmount        Int // Amount in cents (multiply by 100)
+  active              Boolean           @default(true)
+  betNonce            Int // Unique nonce for this specific bet
+  provablyFairState   ProvablyFairState @relation(fields: [provablyFairStateId], references: [id])
+  provablyFairStateId String
+  state               Json // Game-specific state and result data
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  user                User              @relation(fields: [userId], references: [id])
+
+  @@index([provablyFairStateId])
+  @@index([game])
+  @@map("bets")
+}

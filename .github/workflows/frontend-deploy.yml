@@ -1,0 +1,87 @@
+name: Deploy Frontend to S3 and CloudFront
+
+on:
+  push:
+    branches:
+      - dont-deploy
+    paths:
+      - 'apps/frontend/**'
+      - 'packages/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/frontend-deploy.yml'
+  workflow_dispatch: # Allow manual triggering
+
+env:
+  NODE_VERSION: 22.14.0 # Latest LTS version
+  PNPM_VERSION: 9.9.0
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Frontend
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Needed for AWS OIDC authentication
+      contents: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install PNPM
+        run: npm install -g pnpm@${{ env.PNPM_VERSION }}
+
+      - name: Setup Environment Variables
+        run: |
+          echo "VITE_APP_API_URL=${{ secrets.VITE_APP_API_URL }}" >> .env
+          echo "VITE_APP_VERSION=${GITHUB_SHA::7}" >> .env
+          echo "VITE_APP_ENVIRONMENT=production" >> .env
+        working-directory: ./apps/frontend
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Frontend
+        run: pnpm run build --filter=frontend
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to S3
+        run: |
+          aws s3 sync ./apps/frontend/dist/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
+            --delete \
+            --cache-control "max-age=31536000,public" \
+            --exclude "*.html" \
+            --exclude "robots.txt" \
+            --exclude "sitemap.xml"
+
+          # Upload HTML files with different cache settings
+          aws s3 sync ./apps/frontend/dist/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
+            --cache-control "max-age=0,no-cache,no-store,must-revalidate" \
+            --content-type "text/html" \
+            --exclude "*" \
+            --include "*.html" \
+            --include "robots.txt" \
+            --include "sitemap.xml"
+
+      - name: Invalidate CloudFront Distribution
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+      - name: Deployment Notification
+        if: success()
+        run: |
+          echo "Frontend successfully deployed to production."
+          echo "Commit: ${GITHUB_SHA::7}"
+          echo "Branch: ${GITHUB_REF#refs/heads/}"

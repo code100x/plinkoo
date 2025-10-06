@@ -1,0 +1,35 @@
+FROM node:22-slim
+
+# 🛠 Install OpenSSL 1.1 (needed by Prisma) and other required packages
+RUN apt-get update && apt-get install -y \
+    openssl \
+    libssl-dev \
+    libstdc++6 \
+    zlib1g \
+    bash \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN npm install -g pnpm@9.9.0
+
+WORKDIR /usr/src/app
+
+COPY ./packages ./packages
+COPY ./pnpm-lock.yaml ./pnpm-lock.yaml
+COPY ./pnpm-workspace.yaml ./pnpm-workspace.yaml
+
+COPY ./package.json ./package.json
+COPY ./tsconfig.json ./tsconfig.json
+COPY ./turbo.json ./turbo.json
+
+COPY ./apps/api ./apps/api
+
+RUN pnpm install --frozen-lockfile
+
+# Generate Prisma client
+RUN pnpm db:generate
+
+RUN pnpm build --filter=api
+
+WORKDIR /usr/src/app/apps/api
+
+CMD ["pnpm", "start"]

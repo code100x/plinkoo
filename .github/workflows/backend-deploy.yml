@@ -1,0 +1,78 @@
+name: Deploy Backend to Production (AWS EC2)
+
+on:
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'apps/api/**'
+  #     - 'packages/**'
+  #     - 'pnpm-lock.yaml'
+  #     - '.github/workflows/backend-deploy.yml'
+  #     - 'Docker/Dockerfile.api'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  deploy:
+    name: Build and Deploy Backend to AWS EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Docker/Dockerfile.api
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/simcasino-api:latest
+            ${{ secrets.DOCKER_USERNAME }}/simcasino-api:${{ github.sha }}
+
+      - name: Deploy to AWS EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            # Pull the latest Docker image from Docker Hub
+            docker pull ${{ secrets.DOCKER_USERNAME }}/simcasino-api:latest
+
+            # Stop and remove the existing container to prevent conflicts
+            # '|| true' ensures the script doesn't fail if the container doesn't exist
+            docker stop simcasino-api || true
+            docker rm simcasino-api || true
+
+            # Run the new container with environment variables from GitHub Secrets
+            docker run -d \
+              --name simcasino-api \
+              --restart always \
+              -p 5000:5000 \
+              -e NODE_ENV=production \
+              -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+              -e COOKIE_SECRET="${{ secrets.COOKIE_SECRET }}" \
+              -e CORS_ORIGIN="${{ secrets.CORS_ORIGIN }}" \
+              -e GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+              -e GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+              -e CLIENT_URL="${{ secrets.CLIENT_URL }}" \
+              -e REDIRECT_URL="${{ secrets.REDIRECT_URL }}" \
+              ${{ secrets.DOCKER_USERNAME }}/simcasino-api:latest
+
+      - name: Deployment Notification
+        if: success()
+        run: |
+          echo "✅ Backend successfully deployed to AWS EC2."
+          echo "   Commit: ${{ github.sha }}"
+          echo "   Image Tag: ${{ secrets.DOCKER_USERNAME }}/simcasino-api:${{ github.sha }}"

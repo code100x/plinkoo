@@ -1,0 +1,11 @@
+{
+  "extends": "@repo/typescript-config/base.json",
+  "compilerOptions": {
+    "moduleResolution": "node16",
+    "module": "Node16",
+    "lib": ["ES2015"],
+    "outDir": "./dist"
+  },
+  "exclude": ["node_modules"],
+  "include": ["."]
+}

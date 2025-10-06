@@ -1,0 +1,10 @@
+{
+  "extends": "@repo/typescript-config/base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "baseUrl": "."
+  },
+  "include": [".", "../../apps/frontend/src/lib/crypto-browserify.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}
